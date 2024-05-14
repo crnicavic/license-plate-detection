@@ -20,7 +20,7 @@ subplot(221), imshow(imrgb);
 imgray = rgb2gray(imrgb);
 
 %convert to black and white
-imbw = imbinarize(imgray, 0.2);
+imbw = imbinarize(imgray, 0.4);
 subplot(222), imshow(imbw);
 
 %now do processing to figure out what works
@@ -28,8 +28,10 @@ subplot(222), imshow(imbw);
 im = edge(imbw, 'sobel');
 subplot(223), imshow(im);
 
-im = imdilate(im, strel('diamond', 1));
+im = imdilate(im, strel('diamond', 2));
 im = imfill(im, 'holes');
+%im = imclearborder(im);
+im = imerode(im, strel('diamond', 4'));
 subplot(224), imshow(im);
 imarea = numel(im);
 
@@ -37,9 +39,9 @@ imarea = numel(im);
 % look for a bounding box with the most boxes inside it
 iprops = regionprops(im, 'BoundingBox', 'Area', 'Image');
 for i = 1:length(iprops)
-    if iprops(i).Area > imarea * 0.0005 && iprops(i).Area < imarea * 0.005
+    %if iprops(i).Area > imarea * 0.0005 && iprops(i).Area < imarea * 0.005
     bbox = iprops(i).BoundingBox;
     
     subplot(221), rectangle('Position', bbox, 'EdgeColor', 'r', 'LineWidth', 2); 
-    end
+    %end
 end
