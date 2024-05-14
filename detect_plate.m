@@ -29,6 +29,7 @@ im = edge(imbw, 'sobel');
 subplot(223), imshow(im);
 
 im = imdilate(im, strel('diamond', 1));
+im = imfill(im, 'holes');
 subplot(224), imshow(im);
 imarea = numel(im);
 
