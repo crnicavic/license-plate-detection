@@ -18,19 +18,22 @@ imgray = rgb2gray(imrgb);
 %now do processing to figure out what works
 %find edges between color changes
 im = edge(imgray, 'sobel');
-subplot(222), imshow(im);
+%subplot(222), imshow(im);
 
 im = imdilate(im, strel('diamond', 2));
 im = imfill(im, 'holes');
-subplot(223), imshow(im);
-%MORE IDEAS: Erode the shit out of the picture than just dilate it back
+subplot(222), imshow(im);
+% doing multiple erosions to get rid of all small artifacts
+% then dilating it back so that i don't lose relevant data
 im = imerode(im, strel('diamond', 10));
 im = imerode(im, strel('diamond', 10));
 im = imdilate(im, strel('square', 20));
+subplot(223), imshow(im);
 im = im .* imgray;
 subplot(224), imshow(im);
 imarea = numel(im);
-
+    
+%TODO: figure out what size bounding boxes to filter
 iprops = regionprops(im, 'BoundingBox', 'Area', 'Image');
 for i = 1:length(iprops)
     %if iprops(i).Area > imarea * 0.0005 && iprops(i).Area < imarea * 0.005
@@ -38,23 +41,6 @@ for i = 1:length(iprops)
     
     subplot(221), rectangle('Position', bbox, 'EdgeColor', 'r', 'LineWidth', 2); 
     %end
-end
-
-function newim = gray_stretch(im, fmin, fmax)
-    [rows, cols] = size(im);
-    newim = zeros(rows, cols);
-    range = fmax - fmin;
-    for row = 1:rows
-        for col = 1:cols
-            if im(row, col) < fmin
-                newim(row, col) = 0;
-            elseif im(row, col) > fmax
-                newim(row, col) = 1;
-            else
-                newim(row, col) = (im(row, col) - fmin) / range;
-            end
-        end
-    end
 end
 
 %histogram eq of rgb picture
